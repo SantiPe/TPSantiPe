@@ -3,21 +3,86 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.santipe.tpClub;
+package com.santipe.tp_club;
 
+import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import javax.swing.JOptionPane;
+import javax.swing.table.DefaultTableModel;
 
 /**
- *
- * @author santi
+ * Trabajo practico - Clubes
+ * @author Santiago Perrin <1santiagoperrin@gmail.com>
  */
 public class Socios extends javax.swing.JFrame {
-
+    private Connection conexion;
     /**
      * Creates new form Socios
      */
     public Socios() {
         initComponents();
+        cargarSocios();
+    }
+    
+    private Connection getDatabaseConnection() {
+        if (this.conexion == null) {
+            File temp = new File("tablaSocios.db");
+            String connstr = "jdbc:sqlite:" + temp.getAbsolutePath().replace("\\","\\\\");
+            try {
+                Class.forName("org.sqlite.JDBC");
+                this.conexion = DriverManager.getConnection(connstr);
+                return this.conexion;
+            } catch (ClassNotFoundException ex) {
+                JOptionPane.showMessageDialog(null, "Ocurrio un error al conectarse con la base de datos, al parecer el Driver 'org.sqlite.JDBC' no esta disponible.");
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, "Ocurrio un error al conectarse con la base de datos.");
+            }
+            return null;
+        }
+        return this.conexion;
+    }
+    
+    private void cargarSocios() {
+        // Creamos un "modelo"
+        DefaultTableModel model = new DefaultTableModel();
+        
+        // Le describimos sus columnas
+        String[] columnNames = {"Id", "Nombre", "Apellido", "Calle", "Numero", "Telefono", "Documento"};
+        model.setColumnIdentifiers(columnNames);
+        
+        // Le avisamos al objeto jTable1 que tiene que usar este modelo
+        jTable1.setModel(model);
+        
+        try {
+            // Nos conectamos a la base de datos
+            Connection conn = this.getDatabaseConnection();
+            
+            // Generamos una nueva consulta
+            Statement stmt = conn.createStatement();
+            
+            // Executamos la consulta
+            ResultSet rs = stmt.executeQuery("SELECT Id, Nombre, Apellido, Calle, Numero, Telefono, Documento FROM Socios");
+            
+            // Obtenemos todas las filas
+            while (rs.next()) {
+                model.addRow(new Object[]{
+                    rs.getInt("Id"),
+                    rs.getString("Nombre"),
+                    rs.getString("Apellido"),
+                    rs.getString("Calle"),
+                    rs.getInt("Numero"),
+                    rs.getString("Telefono"),
+                    rs.getInt("Documento")
+                });
+            }
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Ocurrio un error al obtener los socios de la base de datos.");
+            System.out.println(e.getMessage());
+        }
     }
 
     /**
@@ -349,6 +414,7 @@ public class Socios extends javax.swing.JFrame {
 
     private void botonAltaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_botonAltaActionPerformed
         // TODO add your handling code here:
+        this.conexion = getDatabaseConnection();
         this.limpiarAltaSocio();
         AltaSocio.setVisible(true);
     }//GEN-LAST:event_botonAltaActionPerformed
