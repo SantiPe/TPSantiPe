@@ -7,16 +7,20 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 
 /**
  * Trabajo practico - Clubes
+ *
  * @author Santiago Perrin <1santiagoperrin@gmail.com>
  */
 public class Socios extends javax.swing.JFrame {
+
     private Connection conexion;
     private int modificandoSocio;
+
     /**
      * Creates new form Socios
      */
@@ -24,11 +28,11 @@ public class Socios extends javax.swing.JFrame {
         initComponents();
         actualizarListadoSocios();
     }
-    
+
     private Connection getDatabaseConnection() {
         if (this.conexion == null) {
             File temp = new File("tablaSocios.db");
-            String connstr = "jdbc:sqlite:" + temp.getAbsolutePath().replace("\\","\\\\");
+            String connstr = "jdbc:sqlite:" + temp.getAbsolutePath().replace("\\", "\\\\");
             try {
                 Class.forName("org.sqlite.JDBC");
                 this.conexion = DriverManager.getConnection(connstr);
@@ -42,28 +46,28 @@ public class Socios extends javax.swing.JFrame {
         }
         return this.conexion;
     }
-    
+
     private void actualizarListadoSocios() {
         // Creamos un "modelo"
         DefaultTableModel model = new DefaultTableModel();
-        
+
         // Le describimos sus columnas
         String[] columnNames = {"Id", "Nombre", "Apellido", "Calle", "Numero", "Telefono", "Documento"};
         model.setColumnIdentifiers(columnNames);
-        
+
         // Le avisamos al objeto jTable1 que tiene que usar este modelo
         jTable1.setModel(model);
-        
+
         try {
             // Nos conectamos a la base de datos
             Connection conn = this.getDatabaseConnection();
-            
+
             // Generamos una nueva consulta
             Statement stmt = conn.createStatement();
-            
+
             // Executamos la consulta
             ResultSet rs = stmt.executeQuery("SELECT Id, Nombre, Apellido, Calle, Numero, Telefono, Documento FROM Socios");
-            
+
             // Obtenemos todas las filas
             while (rs.next()) {
                 model.addRow(new Object[]{
@@ -81,15 +85,15 @@ public class Socios extends javax.swing.JFrame {
             System.out.println(e.getMessage());
         }
     }
-    
+
     public boolean insertarSocio(String nombre, String apellido, String calle, int numero, String telefono, int documento) {
         try {
             // Obtenemos una conexion a la BD
             Connection conn = this.getDatabaseConnection();
-            
+
             // Creamos una nueva consulta
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Socios (Nombre, Apellido, Calle, Numero, Telefono, Documento) VALUES (?, ?, ?, ?, ?, ?)");
-            
+
             // Le damos los datos
             pstmt.setString(1, nombre);
             pstmt.setString(2, apellido);
@@ -97,7 +101,7 @@ public class Socios extends javax.swing.JFrame {
             pstmt.setInt(4, numero);
             pstmt.setString(5, telefono);
             pstmt.setInt(6, documento);
-            
+
             // Ejecutamos la consulta
             return (pstmt.executeUpdate() == 1);
         } catch (SQLException ex) {
@@ -106,15 +110,15 @@ public class Socios extends javax.swing.JFrame {
             return false;
         }
     }
-    
+
     public boolean modificarSocio(int id, String nombre, String apellido, String calle, int numero, String telefono, int documento) {
         try {
             // Obtenemos una conexion a la BD
             Connection conn = this.getDatabaseConnection();
-            
+
             // Creamos una nueva consulta
             PreparedStatement pstmt = conn.prepareStatement("UPDATE Socios SET Nombre = ?, Apellido = ?, Calle = ?, Numero = ?, Telefono = ?, Documento = ? WHERE Id = ?");
-            
+
             // Le damos los datos
             pstmt.setString(1, nombre);
             pstmt.setString(2, apellido);
@@ -123,7 +127,7 @@ public class Socios extends javax.swing.JFrame {
             pstmt.setString(5, telefono);
             pstmt.setInt(6, documento);
             pstmt.setInt(7, id);
-            
+
             // Ejecutamos la consulta
             return (pstmt.executeUpdate() == 1);
         } catch (SQLException ex) {
@@ -132,18 +136,18 @@ public class Socios extends javax.swing.JFrame {
             return false;
         }
     }
-    
+
     public boolean eliminarSocio(int id) {
         try {
             // Obtenemos una conexion a la BD
             Connection conn = this.getDatabaseConnection();
-            
+
             // Creamos una nueva consulta
             PreparedStatement pstmt = conn.prepareStatement("DELETE FROM Socios WHERE Id = ?");
-            
+
             // Le damos los datos
             pstmt.setInt(1, id);
-                       
+
             // Ejecutamos la consulta
             return (pstmt.executeUpdate() == 1);
         } catch (SQLException ex) {
@@ -194,12 +198,6 @@ public class Socios extends javax.swing.JFrame {
         darAlta1 = new javax.swing.JButton();
         cancelarAlta1 = new javax.swing.JButton();
         jLabel16 = new javax.swing.JLabel();
-        BajaSocio = new javax.swing.JDialog();
-        jLabel8 = new javax.swing.JLabel();
-        jLabel9 = new javax.swing.JLabel();
-        jTextField7 = new javax.swing.JTextField();
-        hacerBaja = new javax.swing.JButton();
-        cancelarBaja = new javax.swing.JButton();
         jFileChooser1 = new javax.swing.JFileChooser();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
@@ -441,52 +439,6 @@ public class Socios extends javax.swing.JFrame {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jLabel8.setText("BAJA");
-
-        jLabel9.setText("INGRESE EL NUMERO DE SOCIO A ELIMINAR");
-
-        hacerBaja.setText("Aceptar");
-
-        cancelarBaja.setText("Cancelar");
-
-        javax.swing.GroupLayout BajaSocioLayout = new javax.swing.GroupLayout(BajaSocio.getContentPane());
-        BajaSocio.getContentPane().setLayout(BajaSocioLayout);
-        BajaSocioLayout.setHorizontalGroup(
-            BajaSocioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(BajaSocioLayout.createSequentialGroup()
-                .addGroup(BajaSocioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(BajaSocioLayout.createSequentialGroup()
-                        .addGap(156, 156, 156)
-                        .addComponent(jLabel8))
-                    .addGroup(BajaSocioLayout.createSequentialGroup()
-                        .addGap(125, 125, 125)
-                        .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, 87, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(BajaSocioLayout.createSequentialGroup()
-                        .addGap(73, 73, 73)
-                        .addGroup(BajaSocioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addGroup(BajaSocioLayout.createSequentialGroup()
-                                .addComponent(hacerBaja)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(cancelarBaja))
-                            .addComponent(jLabel9))))
-                .addContainerGap(111, Short.MAX_VALUE))
-        );
-        BajaSocioLayout.setVerticalGroup(
-            BajaSocioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(BajaSocioLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel8)
-                .addGap(47, 47, 47)
-                .addComponent(jLabel9, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(jTextField7, javax.swing.GroupLayout.PREFERRED_SIZE, 38, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 75, Short.MAX_VALUE)
-                .addGroup(BajaSocioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(hacerBaja)
-                    .addComponent(cancelarBaja))
-                .addGap(45, 45, 45))
-        );
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(204, 204, 255));
 
@@ -635,11 +587,11 @@ public class Socios extends javax.swing.JFrame {
 
     private void cancelarAltaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarAltaActionPerformed
         int n = JOptionPane.showConfirmDialog(
-            null,
-            "Estas seguro que deseas cancelar?",
-            "Cancelar Alta",
-            JOptionPane.YES_NO_OPTION);
-        
+                null,
+                "Estas seguro que deseas cancelar?",
+                "Cancelar Alta",
+                JOptionPane.YES_NO_OPTION);
+
         if (n == 0) {
             AltaSocio.dispose();
         }
@@ -659,7 +611,7 @@ public class Socios extends javax.swing.JFrame {
         String telefono = jTextField5.getText();
         int numero;
         int documento;
-        
+
         try {
             numero = Integer.parseInt(jTextField4.getText());
         } catch (java.lang.NumberFormatException e) {
@@ -673,7 +625,7 @@ public class Socios extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "El numero de documento debe ser numerico.");
             return;
         }
-        
+
         if (insertarSocio(nombre, apellido, calle, numero, telefono, documento)) {
             AltaSocio.dispose();
             JOptionPane.showMessageDialog(null, "Nuevo socio insertado con exito.");
@@ -688,13 +640,13 @@ public class Socios extends javax.swing.JFrame {
             // Si no hay nada seleccionado, no hago nada :D
             return;
         }
-        
+
         int n = JOptionPane.showConfirmDialog(
-            null,
-            "Estas seguro que deseas eliminar el socio?",
-            "Dar de baja",
-            JOptionPane.YES_NO_OPTION);
-        
+                null,
+                "Estas seguro que deseas eliminar el socio?",
+                "Dar de baja",
+                JOptionPane.YES_NO_OPTION);
+
         if (n == 0) {
             int idSocio = (int) jTable1.getValueAt(jTable1.getSelectedRow(), 0);
             eliminarSocio(idSocio);
@@ -712,11 +664,11 @@ public class Socios extends javax.swing.JFrame {
 
     private void darAlta1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_darAlta1ActionPerformed
         int n = JOptionPane.showConfirmDialog(
-            null,
-            "Estas seguro que deseas realizar la modificacion?",
-            "Modificar",
-            JOptionPane.YES_NO_OPTION);
-        
+                null,
+                "Estas seguro que deseas realizar la modificacion?",
+                "Modificar",
+                JOptionPane.YES_NO_OPTION);
+
         if (n == 0) {
             String nombre = jTextField8.getText();
             String apellido = jTextField9.getText();
@@ -752,11 +704,11 @@ public class Socios extends javax.swing.JFrame {
 
     private void cancelarAlta1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cancelarAlta1ActionPerformed
         int n = JOptionPane.showConfirmDialog(
-            null,
-            "Estas seguro que deseas cancelar?",
-            "Cancelar Modificacion",
-            JOptionPane.YES_NO_OPTION);
-        
+                null,
+                "Estas seguro que deseas cancelar?",
+                "Cancelar Modificacion",
+                JOptionPane.YES_NO_OPTION);
+
         if (n == 0) {
             ModificarSocio.dispose();
         }
@@ -767,7 +719,7 @@ public class Socios extends javax.swing.JFrame {
             // Si no hay nada seleccionado, no hago nada :D
             return;
         }
-        
+
         int id = (int) jTable1.getValueAt(jTable1.getSelectedRow(), 0);
         String nombre = jTable1.getValueAt(jTable1.getSelectedRow(), 1).toString();
         String apellido = jTable1.getValueAt(jTable1.getSelectedRow(), 2).toString();
@@ -775,44 +727,55 @@ public class Socios extends javax.swing.JFrame {
         String numero = jTable1.getValueAt(jTable1.getSelectedRow(), 4).toString();
         String telefono = jTable1.getValueAt(jTable1.getSelectedRow(), 5).toString();
         String documento = jTable1.getValueAt(jTable1.getSelectedRow(), 6).toString();
-        
+
         jTextField8.setText(nombre);
         jTextField9.setText(apellido);
         jTextField10.setText(calle);
         jTextField11.setText(numero);
         jTextField12.setText(telefono);
         jTextField13.setText(documento);
-        
+
         this.modificandoSocio = id;
         ModificarSocio.setVisible(true);
     }//GEN-LAST:event_botonModificarActionPerformed
 
     private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        File archivo = new File("importar.csv");
-        if (CSV.Importar(this.getDatabaseConnection(), archivo.getAbsolutePath())) {
-            JOptionPane.showMessageDialog(null, "Importado con exito.");   
-        } else {
-            JOptionPane.showMessageDialog(null, "Ocurrio un error al importar.");
+        // Abrimos un menu del tipo "Abrir archivo"
+        int returnValue = jFileChooser1.showOpenDialog(null);
+
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File archivo = jFileChooser1.getSelectedFile();
+            
+            if (CSV.Importar(this.getDatabaseConnection(), archivo.getAbsolutePath())) {
+                JOptionPane.showMessageDialog(null, "Importado con exito.");
+            } else {
+                JOptionPane.showMessageDialog(null, "Ocurrio un error al importar.");
+            }
+            actualizarListadoSocios();
         }
-        actualizarListadoSocios();
     }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem2ActionPerformed
-        File archivo = new File("exportar.csv");
-        if (CSV.Exportar(this.getDatabaseConnection(), archivo.getAbsolutePath())) {
-            JOptionPane.showMessageDialog(null, "Exportado con exito.");   
-        } else {
-            JOptionPane.showMessageDialog(null, "Ocurrio un error al exportar.");
+        int returnValue = jFileChooser1.showSaveDialog(null);
+
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File archivo = jFileChooser1.getSelectedFile();
+            
+            if (CSV.Exportar(this.getDatabaseConnection(), archivo.getAbsolutePath())) {
+                JOptionPane.showMessageDialog(null, "Exportado con exito.");
+            } else {
+                JOptionPane.showMessageDialog(null, "Ocurrio un error al exportar.");
+            }
         }
     }//GEN-LAST:event_jMenuItem2ActionPerformed
 
     private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
         int n = JOptionPane.showConfirmDialog(
-            null,
-            "Estas seguro que deseas salir de la aplicacion?",
-            "Salir",
-            JOptionPane.YES_NO_OPTION);
-        
+                null,
+                "Estas seguro que deseas salir de la aplicacion?",
+                "Salir",
+                JOptionPane.YES_NO_OPTION);
+
         if (n == 0) {
             System.exit(0);
         }
@@ -852,7 +815,7 @@ public class Socios extends javax.swing.JFrame {
             }
         });
     }
-    
+
     public void limpiarAltaSocio() {
         this.jTextField1.setText("");
         this.jTextField2.setText("");
@@ -860,22 +823,18 @@ public class Socios extends javax.swing.JFrame {
         this.jTextField4.setText("");
         this.jTextField5.setText("");
         this.jTextField6.setText("");
-        this.jTextField7.setText("");
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JDialog AltaSocio;
-    private javax.swing.JDialog BajaSocio;
     private javax.swing.JDialog ModificarSocio;
     private javax.swing.JButton botonAlta;
     private javax.swing.JButton botonBaja;
     private javax.swing.JButton botonModificar;
     private javax.swing.JButton cancelarAlta;
     private javax.swing.JButton cancelarAlta1;
-    private javax.swing.JButton cancelarBaja;
     private javax.swing.JButton darAlta;
     private javax.swing.JButton darAlta1;
-    private javax.swing.JButton hacerBaja;
     private javax.swing.JFileChooser jFileChooser1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -891,8 +850,6 @@ public class Socios extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
-    private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;
@@ -911,7 +868,6 @@ public class Socios extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField4;
     private javax.swing.JTextField jTextField5;
     private javax.swing.JTextField jTextField6;
-    private javax.swing.JTextField jTextField7;
     private javax.swing.JTextField jTextField8;
     private javax.swing.JTextField jTextField9;
     // End of variables declaration//GEN-END:variables

@@ -14,25 +14,26 @@ import java.sql.Statement;
 import javax.swing.JOptionPane;
 
 /**
- * Trabajo practico - Clubes
- * Clase para Importar y Exportar CSV hacia/desde la base de datos
+ * Trabajo practico - Clubes Clase para Importar y Exportar CSV hacia/desde la
+ * base de datos
+ *
  * @author Santiago Perrin <1santiagoperrin@gmail.com>
  */
 public class CSV {
+
     /*
         BASADO EN:
         https://examples.javacodegeeks.com/core-java/sql/import-csv-file-to-mysql-table-java-example/
         https://www.journaldev.com/12014/opencsv-csvreader-csvwriter-example
-    */
-    
+     */
     public static boolean Importar(Connection conn, String filename) {
         try {
             // Generamos una instancia del lector CSV
             CSVReader reader = new CSVReader(new FileReader(filename), ',');
-                
+
             // Creamos una nueva consulta
             PreparedStatement pstmt = conn.prepareStatement("INSERT INTO Socios (Nombre, Apellido, Calle, Numero, Telefono, Documento) VALUES (?, ?, ?, ?, ?, ?)");
-            
+
             String[] rowData = null;
             int i = 0;
             while ((rowData = reader.readNext()) != null) {
@@ -43,22 +44,25 @@ public class CSV {
                 pstmt.setInt(4, Integer.parseInt(rowData[3].trim()));
                 pstmt.setString(5, rowData[4].trim());
                 pstmt.setInt(6, Integer.parseInt(rowData[5].trim()));
-                    
+
                 pstmt.addBatch();
-                    
+
                 if (++i % 10 == 0) {
                     pstmt.executeBatch();
                 }
             }
-            
+
             pstmt.executeBatch();
             return true;
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "No existe el archivo.");
+            System.out.println(e.getMessage());
         } catch (IOException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Ocurrio un error al leer el archivo.");
+            System.out.println(e.getMessage());
         } catch (SQLException e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "Ocurrio un error importar los socios a la base de datos.");
+            System.out.println(e.getMessage());
         }
         return false;
     }
@@ -67,13 +71,13 @@ public class CSV {
         try {
             // Generamos un nuevo CSVWriter
             CSVWriter csvWriter = new CSVWriter(new FileWriter(filename, true), ',');
-                     
+
             // Generamos una nueva consulta
             Statement stmt = conn.createStatement();
-            
+
             // Executamos la consulta
             ResultSet rs = stmt.executeQuery("SELECT Id, Nombre, Apellido, Calle, Numero, Telefono, Documento FROM Socios");
-            
+
             // Obtenemos todas las filas
             while (rs.next()) {
                 String[] fila = {
@@ -83,17 +87,14 @@ public class CSV {
                     rs.getString("Calle"),
                     String.valueOf(rs.getInt("Numero")),
                     rs.getString("Telefono"),
-                    String.valueOf(rs.getInt("Documento")) 
+                    String.valueOf(rs.getInt("Documento"))
                 };
                 csvWriter.writeNext(fila);
             }
             csvWriter.close();
             return true;
-            
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Ocurrio un error al obtener los socios de la base de datos.");
-            System.out.println(e.getMessage());
-        } catch (SQLException e) {
+
+        } catch (IOException | SQLException e) {
             JOptionPane.showMessageDialog(null, "Ocurrio un error al obtener los socios de la base de datos.");
             System.out.println(e.getMessage());
         }
